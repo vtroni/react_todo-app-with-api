@@ -1,5 +1,7 @@
 import React from 'react';
+import classNames from 'classnames';
 import { Todo } from '../types/Todo';
+import { filterOptions } from '../App';
 
 interface TodoFooterProps {
   todos: Todo[];
@@ -14,37 +16,27 @@ const TodoFooter: React.FC<TodoFooterProps> = ({
   setSelectedFilter,
   clearCompletedTodos,
 }) => {
+  const itemsLeft = todos.filter(todo => !todo.completed).length;
+
   return (
     <footer className="todoapp__footer" data-cy="Footer">
       <span className="todo-count" data-cy="TodosCounter">
-        {todos.filter(todo => !todo.completed).length} items left
+        {itemsLeft} items left
       </span>
 
       <nav className="filter" data-cy="Filter">
-        <button
-          type="button"
-          className={`filter__link ${selectedFilter === 'all' ? 'selected' : ''}`}
-          data-cy="FilterLinkAll"
-          onClick={() => setSelectedFilter('all')}
-        >
-          All
-        </button>
-        <button
-          type="button"
-          className={`filter__link ${selectedFilter === 'active' ? 'selected' : ''}`}
-          data-cy="FilterLinkActive"
-          onClick={() => setSelectedFilter('active')}
-        >
-          Active
-        </button>
-        <button
-          type="button"
-          className={`filter__link ${selectedFilter === 'completed' ? 'selected' : ''}`}
-          data-cy="FilterLinkCompleted"
-          onClick={() => setSelectedFilter('completed')}
-        >
-          Completed
-        </button>
+        {Object.values(filterOptions).map(filter => (
+          <a
+            key={filter}
+            className={classNames('filter__link', {
+              selected: selectedFilter === filter,
+            })}
+            data-cy="FilterLinkAll"
+            onClick={() => setSelectedFilter(filter)}
+          >
+            {filter}
+          </a>
+        ))}
       </nav>
 
       <button

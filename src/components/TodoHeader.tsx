@@ -21,7 +21,7 @@ const TodoHeader: React.FC<TodoHeaderProps> = ({
     <header className="todoapp__header">
       <button
         type="button"
-        className={`todoapp__toggle-all`}
+        className="todoapp__toggle-all"
         data-cy="ToggleAllButton"
         onClick={handleToggleAll}
       />

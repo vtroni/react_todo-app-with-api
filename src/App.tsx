@@ -14,6 +14,12 @@ import TodoHeader from './components/TodoHeader';
 import TodoFooter from './components/TodoFooter';
 import TodoList from './components/TodoList';
 
+export const filterOptions = {
+  All: 'all',
+  Active: 'active',
+  Completed: 'completed',
+};
+
 export const App: React.FC = () => {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -42,7 +48,7 @@ export const App: React.FC = () => {
     const loadTodos = async () => {
       try {
         const loadedTodos = await getTodos();
-        
+
         setTodos(loadedTodos);
       } catch {
         setErrorMessage('Unable to load todos');
@@ -54,11 +60,9 @@ export const App: React.FC = () => {
 
   const filteredTodos = todos.filter(todo => {
     switch (selectedFilter) {
-      case 'all':
-        return true;
-      case 'completed':
+      case filterOptions.Completed:
         return todo.completed;
-      case 'active':
+      case filterOptions.Active:
         return !todo.completed;
       default:
         return true;
