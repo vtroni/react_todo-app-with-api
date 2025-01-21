@@ -13,17 +13,12 @@ import { Todo } from './types/Todo';
 import TodoHeader from './components/TodoHeader';
 import TodoFooter from './components/TodoFooter';
 import TodoList from './components/TodoList';
-
-export const filterOptions = {
-  All: 'all',
-  Active: 'active',
-  Completed: 'completed',
-};
+import { filterOptions } from './types/filterOptions';
 
 export const App: React.FC = () => {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [selectedFilter, setSelectedFilter] = useState('all');
+  const [selectedFilter, setSelectedFilter] = useState(filterOptions.All);
   const [newTitle, setNewTitle] = useState('');
   const [loadingTodoId, setLoadingTodoId] = useState<number | null>(null);
   const [isInputDisabled, setIsInputDisabled] = useState(false);
