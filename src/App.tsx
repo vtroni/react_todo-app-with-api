@@ -15,9 +15,11 @@ import TodoFooter from './components/TodoFooter';
 import TodoList from './components/TodoList';
 import { filterOptions } from './types/filterOptions';
 import classNames from 'classnames';
+import TodoItem from './components/TodoItem';
 
 export const App: React.FC = () => {
   const [todos, setTodos] = useState<Todo[]>([]);
+  const [tempTodo, setTempTodo] = useState<Todo | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [selectedFilter, setSelectedFilter] = useState(filterOptions.All);
   const [newTitle, setNewTitle] = useState('');
@@ -74,41 +76,47 @@ export const App: React.FC = () => {
       return;
     }
 
-    const tempId = Math.random();
     const trimmedTitle = newTitle.trim();
+    const tempId = Math.random();
 
     setLoadingTodoId(tempId);
     setIsInputDisabled(true);
     setErrorMessage(null);
 
-    const newTodo: Todo = {
-      id: tempId,
+    setTempTodo({
       title: trimmedTitle,
       completed: false,
       userId: USER_ID,
+      id: 0,
+    });
+
+    const newTempTodo: Todo = {
+      title: trimmedTitle,
+      completed: false,
+      userId: USER_ID,
+      id: tempId,
     };
 
-    setTodos(currentTodos => [...currentTodos, newTodo]);
+    setTempTodo(newTempTodo);
 
-    try {
-      const addedTodo = await crateTodo({
-        title: trimmedTitle,
-        completed: false,
-        userId: USER_ID,
+    crateTodo({
+      title: trimmedTitle,
+      completed: false,
+      userId: USER_ID,
+    })
+      .then(newTodo => {
+        setTodos(currentTodos => [...currentTodos, newTodo]);
+        setNewTitle('');
+      })
+      .catch(() => {
+        setErrorMessage('Unable to add a todo');
+      })
+      .finally(() => {
+        setTempTodo(null);
+        setLoadingTodoId(null);
+        setIsInputDisabled(false);
+        setTimeout(() => inputRef.current?.focus(), 250);
       });
-
-      setTodos(prevTodos =>
-        prevTodos.map(todo => (todo.id === tempId ? addedTodo : todo)),
-      );
-      setNewTitle('');
-    } catch {
-      setErrorMessage('Unable to add a todo');
-      setTodos(currentTodos => currentTodos.filter(todo => todo.id !== tempId));
-    } finally {
-      setLoadingTodoId(null);
-      setIsInputDisabled(false);
-      setTimeout(() => inputRef.current?.focus(), 250);
-    }
   };
 
   const removeTodo = async (id: number) => {
@@ -242,6 +250,16 @@ export const App: React.FC = () => {
           toggleTodo={toggleTodo}
           updateTodoTitle={updateTodoTitle}
         />
+
+        {tempTodo && (
+          <TodoItem
+            todo={tempTodo}
+            loadingTodoId={loadingTodoId}
+            deleteTodo={removeTodo}
+            toggleTodo={toggleTodo}
+            updateTodoTitle={updateTodoTitle}
+          />
+        )}
 
         {todos.length > 0 && (
           <TodoFooter
