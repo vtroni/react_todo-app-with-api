@@ -5,7 +5,7 @@ import { Todo } from '../types/Todo';
 
 type Props = {
   todo: Todo;
-  deleteTodo: (id: number) => boolean | void;
+  deleteTodo: (id: number) => Promise<void | null>;
   loadingTodoId: number | null;
   toggleTodo: (todo: Todo) => void;
   updateTodoTitle: (todo: Todo, newTitle: string) => Promise<void>;

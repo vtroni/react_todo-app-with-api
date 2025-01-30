@@ -18,6 +18,10 @@ const TodoFooter: React.FC<TodoFooterProps> = ({
 }) => {
   const itemsLeft = todos.filter(todo => !todo.completed).length;
 
+  const capitalize = (value: string): string => {
+    return value.charAt(0).toUpperCase() + value.slice(1);
+  };
+
   return (
     <footer className="todoapp__footer" data-cy="Footer">
       <span className="todo-count" data-cy="TodosCounter">
@@ -31,10 +35,10 @@ const TodoFooter: React.FC<TodoFooterProps> = ({
             className={classNames('filter__link', {
               selected: selectedFilter === filter,
             })}
-            data-cy="FilterLinkAll"
+            data-cy={`FilterLink${capitalize(filter)}`}
             onClick={() => setSelectedFilter(filter)}
           >
-            {filter}
+            {capitalize(filter)}
           </a>
         ))}
       </nav>

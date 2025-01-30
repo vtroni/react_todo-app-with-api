@@ -1,6 +1,9 @@
 import React from 'react';
+import { Todo } from '../types/Todo';
 
 interface TodoHeaderProps {
+  todos: Todo[];
+  loadingTodoId: number | null;
   newTitle: string;
   setNewTitle: React.Dispatch<React.SetStateAction<string>>;
   addTodo: (e: React.FormEvent<HTMLFormElement>) => void;
@@ -10,6 +13,8 @@ interface TodoHeaderProps {
 }
 
 const TodoHeader: React.FC<TodoHeaderProps> = ({
+  todos,
+  loadingTodoId,
   newTitle,
   setNewTitle,
   addTodo,
@@ -19,12 +24,14 @@ const TodoHeader: React.FC<TodoHeaderProps> = ({
 }) => {
   return (
     <header className="todoapp__header">
-      <button
-        type="button"
-        className="todoapp__toggle-all"
-        data-cy="ToggleAllButton"
-        onClick={handleToggleAll}
-      />
+      {todos.length > 0 && !loadingTodoId && (
+        <button
+          type="button"
+          className={`todoapp__toggle-all ${todos.every(todo => todo.completed) ? 'active' : ''}`}
+          data-cy="ToggleAllButton"
+          onClick={handleToggleAll}
+        />
+      )}
 
       <form onSubmit={addTodo}>
         <input

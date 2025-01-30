@@ -14,6 +14,7 @@ import TodoHeader from './components/TodoHeader';
 import TodoFooter from './components/TodoFooter';
 import TodoList from './components/TodoList';
 import { filterOptions } from './types/filterOptions';
+import classNames from 'classnames';
 
 export const App: React.FC = () => {
   const [todos, setTodos] = useState<Todo[]>([]);
@@ -87,7 +88,7 @@ export const App: React.FC = () => {
       userId: USER_ID,
     };
 
-    setTodos([...todos, newTodo]);
+    setTodos(currentTodos => [...currentTodos, newTodo]);
 
     try {
       const addedTodo = await crateTodo({
@@ -136,26 +137,40 @@ export const App: React.FC = () => {
           );
         })
         .catch(() => {
-          setErrorMessage(`Failed to delete todo: ${todo.title}`);
+          setErrorMessage('Unable to delete a todo');
         }),
     );
 
     try {
       await Promise.allSettled(deleteTodos);
+      inputRef.current?.focus();
     } catch {
       setErrorMessage('Error occurred while clearing completed todos.');
     }
   };
 
   const handleToggleAll = () => {
-    const areAllCompleted = todos.every(todo => todo.completed);
+    const areAllCompleted = todos.some(todo => !todo.completed);
+
+    const todosToUpdate = todos.filter(
+      todo => todo.completed !== areAllCompleted,
+    );
 
     setTodos(prevTodos =>
       prevTodos.map(todo => ({
         ...todo,
-        completed: !areAllCompleted,
+        completed: areAllCompleted,
       })),
     );
+
+    todosToUpdate.forEach(todo => {
+      updateTodo({
+        ...todo,
+        completed: areAllCompleted,
+      }).catch(() => {
+        setErrorMessage('Unable to update a todo');
+      });
+    });
   };
 
   const toggleTodo = async (todo: Todo) => {
@@ -210,6 +225,8 @@ export const App: React.FC = () => {
 
       <div className="todoapp__content">
         <TodoHeader
+          todos={todos}
+          loadingTodoId={loadingTodoId}
           newTitle={newTitle}
           setNewTitle={setNewTitle}
           addTodo={addTodo}
@@ -236,20 +253,23 @@ export const App: React.FC = () => {
         )}
       </div>
 
-      {errorMessage && (
-        <div
-          data-cy="ErrorNotification"
-          className="notification is-danger is-light has-text-weight-normal"
-        >
-          <button
-            data-cy="HideErrorButton"
-            type="button"
-            className="delete"
-            onClick={() => setErrorMessage(null)}
-          />
-          {errorMessage}
-        </div>
-      )}
+      <div
+        data-cy="ErrorNotification"
+        className={classNames(
+          'notification is-danger is-light has-text-weight-normal',
+          {
+            hidden: !errorMessage,
+          },
+        )}
+      >
+        <button
+          data-cy="HideErrorButton"
+          type="button"
+          className="delete"
+          onClick={() => setErrorMessage(null)}
+        />
+        {errorMessage}
+      </div>
     </div>
   );
 };

@@ -6,7 +6,7 @@ import { Todo } from '../types/Todo';
 interface TodoListProps {
   filteredTodos: Todo[];
   loadingTodoId: number | null;
-  deleteTodo: (todoId: number) => void;
+  deleteTodo: (id: number) => Promise<void | null>;
   toggleTodo: (todo: Todo) => void;
   updateTodoTitle: (todo: Todo, newTitle: string) => Promise<void>;
 }
